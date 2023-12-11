@@ -6,10 +6,18 @@ import { TodosModule } from './todos/todos.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { MyGlobalJwtModule } from './jwt/jwt.module';
 
 
 @Module({
-  imports: [PrismaModule, TodosModule, UsersModule, AuthModule, ConfigModule.forRoot({isGlobal:true})],
+  imports: [
+    PrismaModule,
+    ConfigModule.forRoot({isGlobal:true}),
+    MyGlobalJwtModule,
+    TodosModule,
+    UsersModule,
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

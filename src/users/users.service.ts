@@ -1,3 +1,4 @@
+import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from './../prisma/prisma.service';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt'
@@ -6,7 +7,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService:PrismaService){}
+  constructor(
+    private readonly prismaService:PrismaService,
+    private readonly jwtService:JwtService
+    ){}
 
   private async hashingPassword(password:string) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(10))
@@ -26,7 +30,9 @@ export class UsersService {
       throw new BadRequestException('Данный Email уже используется')
     }else{
       const hashedPassword = await this.hashingPassword(createUserDto.password)
-      return this.prismaService.user.create({data:{email:createUserDto.email, password:hashedPassword}})
+      const user =  await this.prismaService.user.create({data:{email:createUserDto.email, password:hashedPassword}})
+      const payload = {sub:user.id, email:user.email}
+      return{access_token:this.jwtService.sign(payload), id:user.id, email:user.email}
     }
   }
 

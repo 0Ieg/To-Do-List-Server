@@ -1,7 +1,6 @@
 import { UsersService } from './../users/users.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config'
 import * as bcrypt from 'bcrypt'
 
 
@@ -25,9 +24,9 @@ export class AuthService {
       throw new UnauthorizedException('The user with this email was not found')
     }
   }
-  async signIn ( id:string, email:string, username:string){
-    const payload = {id, email}
-    const access_token = await this.jwtService.signAsync(payload)
-    return {id, email, username, access_token}
+
+  async login (user:any){
+    const payload = {sub:user.id, email:user.email}
+    return {access_token: this.jwtService.sign(payload)}
   }
 }
